@@ -18,10 +18,12 @@ The dataset comes from **Kaggle**, where it was compiled from publicly available
 ## Steps Completed
 
 ### 1. Importing the Dataset
-- Loaded the dataset with **Pandas** using `pd.read_csv()`.  
+- Loaded the dataset with **Pandas** using `pd.read_csv()`.
+- Loaded the dataset with **Polars** using `pl.read_csv()`.  
 
 ### 2. Inspecting the Data
 - Inspected with `.head()`, `.info()`, `.describe()`, `.shape` and checks for missing values.
+- Also inspected using the **Polars** equivalents
 
 ### 3. Basic Filtering and Grouping
 - Filter down to only rows for SBD competitions so there are attempts for all lifts
@@ -30,7 +32,8 @@ The dataset comes from **Kaggle**, where it was compiled from publicly available
 
 ### 4. Machine Learning Exploration
 - Defined features: `Sex`, `Equipment`, `BodyweightKg`, `AgeClass`.  
-- Target variable: `TotalKg`.  
+- Target variable: `TotalKg`.
+- **Polars** and **Pandas** workflows are merged as the data all goes to **Pandas** for **Sklearn** compatibility. 
 - Preprocessing:
   - One-hot encoded categorical variables.
   - Imputed missing numeric values with the median.  
