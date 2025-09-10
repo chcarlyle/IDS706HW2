@@ -13,7 +13,8 @@ from lightgbm import LGBMRegressor
 from sklearn.model_selection import RandomizedSearchCV
 #Load data
 pf_df = pd.read_csv('openpowerlifting.csv')
-pf_df_polars = pl.read_csv("openpowerlifting.csv")
+pf_df_polars = pl.read_csv("openpowerlifting.csv", 
+                           dtypes={"Age": pl.Float64})
 #Inspect data
 print(pf_df.head())
 print(pf_df.describe())

@@ -48,6 +48,7 @@ The dataset comes from **Kaggle**, where it was compiled from publicly available
 ### 5. Visualization
 - Created a scatter plot of **Actual vs Predicted TotalKg** with a reference diagonal.  
 - This highlights how closely the model’s predictions align with true outcomes.
+ ![PredictedVsActualPlot](PredVActual.png)
 
 ---
 
