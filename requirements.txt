@@ -1,0 +1,6 @@
+pytest
+pandas
+polars
+scikit-learn
+matplotlib
+lightgbm
