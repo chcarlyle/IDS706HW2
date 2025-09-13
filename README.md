@@ -10,6 +10,30 @@ This assignment explores the [OpenPowerlifting dataset](https://www.kaggle.com/d
 
 ---
 
+## Automated Testing
+
+The repository includes a script, `test_powerlifting.py`, which provides automated unit tests for the core data analysis and machine learning workflow. This script uses Python's `unittest` framework and covers:
+
+- **Basic Functionality:**
+  - Data loading with both Pandas and Polars
+  - Filtering for SBD events
+  - Running the machine learning pipeline (LightGBM regression) on a sample
+
+- **Edge Cases:**
+  - Handling empty dataframes
+  - Missing required columns
+  - Features with all missing values
+  - No SBD events present
+  - Invalid values (e.g., negative weights)
+
+These tests help ensure the robustness of the analysis code, catching common data issues and verifying that the pipeline either handles or fails gracefully in problematic scenarios. To run the tests, execute:
+
+```bash
+python test_powerlifting.py
+```
+
+All tests should pass if the environment and data are set up correctly.
+
 ## Dataset
 The dataset comes from **Kaggle**, where it was compiled from publicly available powerlifting competition results.
 
