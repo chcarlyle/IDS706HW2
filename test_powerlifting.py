@@ -1,4 +1,5 @@
 
+
 import unittest
 import pandas as pd
 import polars as pl
@@ -9,6 +10,11 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.impute import SimpleImputer
 from lightgbm import LGBMRegressor
 from sklearn.metrics import mean_squared_error
+import warnings
+
+# Suppress LightGBM 'no further splits with positive gain' warnings
+warnings.filterwarnings("ignore", message="No further splits with positive gain, best gain:*")
+warnings.filterwarnings("ignore", category=UserWarning, module="lightgbm")
 
 class TestPowerlifting(unittest.TestCase):
     @classmethod
@@ -69,11 +75,9 @@ class TestPowerlifting(unittest.TestCase):
             ('preprocessor', preprocessor),
             ('regressor', LGBMRegressor(objective='regression', random_state=253))
         ])
-        # Should not raise, imputer should handle all-missing
-        try:
+        # Should raise ValueError, as all values are missing in BodyweightKg
+        with self.assertRaises(ValueError):
             model.fit(X, y)
-        except Exception as e:
-            self.fail(f"Model failed on all-missing values: {e}")
 
     def test_no_sbd_events(self):
         # Edge case: no SBD events present
