@@ -1,5 +1,7 @@
 # Powerlifting Data Analysis – Week 1 Project
 
+![Test Status](https://github.com/chcarlyle/IDS706HW2/actions/workflows/python-tests.yml/badge.svg)
+
 ## Overview
 This assignment explores the [OpenPowerlifting dataset](https://www.kaggle.com/datasets/open-powerlifting/powerlifting-database) as part of the two-week data analysis assignment. The goals for this first week are to:
 - Import and inspect the dataset.

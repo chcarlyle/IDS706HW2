@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+.env
+
+# Test/coverage
+htmlcov/
+.coverage
+.pytest_cache/
+
+# Data/outputs
+outputs/
+*.png
+
+# VS Code / Devcontainer
+.vscode/
+.devcontainer/.venv/
+
+# Docker
+*.egg-info/
+dist/
+build/
