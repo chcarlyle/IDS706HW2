@@ -15,7 +15,8 @@ class TestPowerlifting(unittest.TestCase):
     def setUpClass(cls):
         # Load a small sample for testing
         cls.pd_df = pd.read_csv('openpowerlifting.csv', nrows=100)
-        cls.pl_df = pl.read_csv('openpowerlifting.csv', dtypes={"Age": pl.Float64}).head(100)
+        # Let Polars infer types and skip problematic rows
+        cls.pl_df = pl.read_csv('openpowerlifting.csv', ignore_errors=True).head(100)
 
     def test_empty_dataframe(self):
         # Edge case: empty DataFrame
