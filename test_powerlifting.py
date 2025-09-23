@@ -21,7 +21,9 @@ class TestPowerlifting(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Choose data source: prefer real CSV, but fall back to sample if missing or LFS pointer
-        data_dir = Path('data')
+        # Resolve data directory relative to this test file so tests run from any cwd
+        repo_root = Path(__file__).resolve().parent
+        data_dir = repo_root / 'data'
         real = data_dir / 'openpowerlifting.csv'
         sample = data_dir / 'openpowerlifting_sample.csv'
         data_file = real
