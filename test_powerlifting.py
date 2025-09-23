@@ -11,6 +11,7 @@ from sklearn.impute import SimpleImputer
 from lightgbm import LGBMRegressor
 from sklearn.metrics import mean_squared_error
 import warnings
+from pathlib import Path
 
 # Suppress LightGBM 'no further splits with positive gain' warnings
 warnings.filterwarnings("ignore", message="No further splits with positive gain, best gain:*")
@@ -19,10 +20,35 @@ warnings.filterwarnings("ignore", category=UserWarning, module="lightgbm")
 class TestPowerlifting(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        # Choose data source: prefer real CSV, but fall back to sample if missing or LFS pointer
+        data_dir = Path('data')
+        real = data_dir / 'openpowerlifting.csv'
+        sample = data_dir / 'openpowerlifting_sample.csv'
+        data_file = real
+        use_sample = False
+        if not real.exists():
+            use_sample = True
+        else:
+            # detect Git LFS pointer
+            try:
+                with real.open('r', encoding='utf-8', errors='ignore') as f:
+                    first = f.readline().strip()
+                    if first.startswith('version https://git-lfs.github.com/spec/v1'):
+                        use_sample = True
+            except Exception:
+                use_sample = True
+
+        if use_sample:
+            if sample.exists():
+                data_file = sample
+                print('Using sample CSV for tests: data/openpowerlifting_sample.csv')
+            else:
+                raise FileNotFoundError('No usable data/openpowerlifting.csv or data/openpowerlifting_sample.csv found')
+
         # Load a small sample for testing
-        cls.pd_df = pd.read_csv('openpowerlifting.csv', nrows=100)
+        cls.pd_df = pd.read_csv(data_file, nrows=100)
         # Let Polars infer types and skip problematic rows
-        cls.pl_df = pl.read_csv('openpowerlifting.csv', ignore_errors=True).head(100)
+        cls.pl_df = pl.read_csv(str(data_file), ignore_errors=True).head(100)
 
     def test_empty_dataframe(self):
         # Edge case: empty DataFrame

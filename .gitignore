@@ -13,6 +13,10 @@ htmlcov/
 .pytest_cache/
 
 # Data/outputs
+data/
+# Keep committed sample file in data/
+!data/openpowerlifting_sample.csv
+
 outputs/
 *.png
 

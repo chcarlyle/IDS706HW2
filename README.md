@@ -41,6 +41,33 @@ The dataset comes from **Kaggle**, where it was compiled from publicly available
 
 ---
 
+## Large dataset (Git LFS) and local development
+
+The full `openpowerlifting.csv` is tracked with Git LFS in this repository. To work with the real dataset locally or in CI, follow these steps:
+
+- Install Git LFS and enable it for your machine:
+
+```bash
+git lfs install
+```
+
+- If you clone the repo, fetch LFS files with:
+
+```bash
+git lfs pull
+```
+
+- CI is configured to download LFS files automatically (the GitHub Actions checkout step uses `lfs: true`).
+
+- For quick local development and to avoid storing huge files in the repo, a small sample `openpowerlifting_sample.csv` is included. The test suite will automatically fall back to this sample if the real CSV is missing or only the LFS pointer is present.
+
+You can also run the helper script to fetch LFS files if available on your machine:
+
+```bash
+./scripts/fetch_lfs.sh
+```
+
+
 ## Steps Completed
 
 ### 1. Importing the Dataset
