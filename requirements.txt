@@ -6,3 +6,4 @@ scikit-learn
 matplotlib
 lightgbm
 pyarrow
+joblib

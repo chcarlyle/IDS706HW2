@@ -11,9 +11,10 @@ from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
 from lightgbm import LGBMRegressor
 from sklearn.model_selection import RandomizedSearchCV
+import joblib
 #Load data
-pf_df = pd.read_csv('openpowerlifting.csv')
-pf_df_polars = pl.read_csv("openpowerlifting.csv", 
+pf_df = pd.read_csv('data/openpowerlifting.csv')
+pf_df_polars = pl.read_csv("data/openpowerlifting.csv", 
                            dtypes={"Age": pl.Float64})
 #Inspect data
 print(pf_df.head())
@@ -114,6 +115,8 @@ best_model = grid_search.best_estimator_
 y_pred_best = best_model.predict(X_test)
 mse_best = mean_squared_error(y_test, y_pred_best)
 print(f'Best Model Mean Squared Error: {mse_best}')
+#Save best model to outputs/
+joblib.dump(best_model, 'outputs/best_powerlifting_model.pkl')
 
 #Plot actual vs predicted
 plt.figure(figsize=(10,6))
@@ -123,3 +126,5 @@ plt.xlabel('Actual TotalKg')
 plt.ylabel('Predicted TotalKg')
 plt.title('Actual vs Predicted TotalKg')
 plt.show()
+#Save figure to outputs/
+plt.savefig('outputs/actual_vs_predicted_totalkg.png')
