@@ -1,27 +1,23 @@
-// For full reference: https://containers.dev/implementors/json_reference/
 {
-    "name": "Powerlifting Data Analysis DevContainer",
-    "image": "mcr.microsoft.com/devcontainers/python:3.11",
-    "features": {
-        "ghcr.io/devcontainers/features/python:1": {
-            "version": "3.11"
-        }
-    },
-    "postCreateCommand": "pip install --upgrade pip && pip install pandas polars scikit-learn lightgbm flake8",
-    "customizations": {
-        "vscode": {
-            "settings": {
-                "python.defaultInterpreterPath": "/usr/local/bin/python",
-                "python.linting.enabled": true,
-                "python.linting.flake8Enabled": true
-            },
-            "extensions": [
-                "ms-python.python",
-                "ms-python.vscode-pylance",
-                "ms-toolsai.jupyter"
-            ]
-        }
-    },
-    "forwardPorts": [],
-    "remoteUser": "vscode"
+  "name": "Python 3.12 (Docker Hub, slim)",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "remoteUser": "vscode",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-toolsai.jupyter"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.terminal.activateEnvironment": false
+      }
+    }
+  },
+  "postCreateCommand": "pip install -U pip && if [ -f requirements.txt ]; then pip install -r requirements.txt; fi",
+  "features": {}
 }

@@ -1,5 +1,16 @@
-FROM mcr.microsoft.com/devcontainers/python:3.11
+FROM python:3.12-slim-bookworm
 
-# [Optional] Install OS packages here if needed
-# RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-#     && apt-get -y install --no-install-recommends <your-package-list-here>
+# Minimal build tools (add more as needed)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git curl ca-certificates build-essential pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user for VS Code
+ARG USERNAME=vscode
+ARG USER_UID=1000
+ARG USER_GID=1000
+RUN groupadd --gid ${USER_GID} ${USERNAME} \
+ && useradd -s /bin/bash --uid ${USER_UID} --gid ${USER_GID} -m ${USERNAME}
+
+WORKDIR /workspaces
+USER ${USERNAME}
