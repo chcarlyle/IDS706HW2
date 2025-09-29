@@ -60,63 +60,77 @@ sbd_summary_polars = (
 print(sbd_summary_polars)
 
 #Define features and target
-features = ['Sex', 'Equipment', 'BodyweightKg', 'AgeClass']
-target = 'TotalKg'
+def default_model(sbd_df_polars, numeric_features, cate_features, target):
+    features = numeric_features + cate_features
+    target = target
 
 #Define features in polars and convert to pandas for sklearn
-sbd_df = sbd_df_polars.select(features + [target]).to_pandas()
+    sbd_df = sbd_df_polars.select(features + [target]).to_pandas()
 
-X = sbd_df[features]
-y = sbd_df[target]
+    X = sbd_df[features]
+    y = sbd_df[target]
 
 #Train-test split
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=253)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=253)
 #Preprocessing pipeline
 #Impute median for numeric features
-numeric_transformer = Pipeline(steps=[
+    numeric_transformer = Pipeline(steps=[
     ('imputer', SimpleImputer(strategy='median'))
 ])
 #One-hot encode categorical features and apply numeric transformer
-preprocessor = ColumnTransformer(
+    preprocessor = ColumnTransformer(
     transformers=[
-        ('cat', OneHotEncoder(handle_unknown='ignore'), ['Sex', 'Equipment', 'AgeClass']),
-        ('num', numeric_transformer, ['BodyweightKg'])
+        ('cat', OneHotEncoder(handle_unknown='ignore'), cate_features),
+        ('num', numeric_transformer, numeric_features + target)
     ]
 )
 #Create the model pipeline using lightgbm
-model = Pipeline(steps=[
+    model = Pipeline(steps=[
     ('preprocessor', preprocessor),
     ('regressor', LGBMRegressor(objective='regression', random_state=253))
 ])
 
 #Train default model
-model.fit(X_train, y_train)
+    model.fit(X_train, y_train)
 #Predict and evaluate
-y_pred = model.predict(X_test)
-mse = mean_squared_error(y_test, y_pred)
-print(f'Default Mean Squared Error: {mse}')
+    y_pred = model.predict(X_test)
+    mse = mean_squared_error(y_test, y_pred)
+    print(f'Default Mean Squared Error: {mse}')
+    return y,X_train,X_test,y_train,y_test,model
+
+y, X_train, X_test, y_train, y_test, model = default_model(sbd_df_polars)
+
+n_estimators = [100, 200, 300]
+max_depth = [3, 5, 7]
+learning_rate = [0.01, 0.1, 0.2]
+subsample = [0.6, 0.8, 1.0]
+reg_alpha = [0, 0.1, 1]
+reg_lambda = [1, 1.5, 2]
 
 #Hyperparameter tuning with RandomizedSearchCV
-param_dist = {
-    'regressor__n_estimators': [100, 200, 300],
-    'regressor__max_depth': [3, 5, 7],
-    'regressor__learning_rate': [0.01, 0.1, 0.2],
-    'regressor__subsample': [0.6, 0.8, 1.0],
-    'regressor__colsample_bytree': [0.6, 0.8, 1.0],
-    'regressor__reg_alpha': [0, 0.1, 1],
-    'regressor__reg_lambda': [1, 1.5, 2]
-}
-grid_search = RandomizedSearchCV(model, param_distributions=param_dist, n_iter=20, scoring='neg_mean_squared_error', cv=3, verbose=1, random_state=253)
-grid_search.fit(X_train, y_train)
-print(f'Best parameters: {grid_search.best_params_}')
+def tune_hypers(X_train, X_test, y_train, y_test, model, n_estimators, max_depth, learning_rate, subsample, reg_alpha, reg_lambda):
+    param_dist = {
+    'regressor__n_estimators': n_estimators,
+    'regressor__max_depth': max_depth,
+    'regressor__learning_rate': learning_rate,
+    'regressor__subsample': subsample,
+    'regressor__reg_alpha': reg_alpha,
+    'regressor__reg_lambda': reg_lambda
+    }
+    grid_search = RandomizedSearchCV(model, param_distributions=param_dist, n_iter=20, scoring='neg_mean_squared_error', cv=3, verbose=1, random_state=253)
+    grid_search.fit(X_train, y_train)
+    print(f'Best parameters: {grid_search.best_params_}')
 
 #Evaluate the best model
-best_model = grid_search.best_estimator_
-y_pred_best = best_model.predict(X_test)
-mse_best = mean_squared_error(y_test, y_pred_best)
-print(f'Best Model Mean Squared Error: {mse_best}')
+    best_model = grid_search.best_estimator_
+    y_pred_best = best_model.predict(X_test)
+    mse_best = mean_squared_error(y_test, y_pred_best)
+    print(f'Best Model Mean Squared Error: {mse_best}')
 #Save best model to outputs/
-joblib.dump(best_model, 'outputs/best_powerlifting_model.pkl')
+    joblib.dump(best_model, 'outputs/best_powerlifting_model.pkl')
+    return y_pred_best
+
+y_pred_best = tune_hypers(X_train, X_test, y_train, y_test, model, n_estimators, max_depth, learning_rate, subsample, reg_alpha, reg_lambda)
 
 #Plot actual vs predicted
 plt.figure(figsize=(10,6))
