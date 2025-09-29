@@ -2,8 +2,10 @@ FROM python:3.12-slim-bookworm
 
 # Minimal build tools (add more as needed)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    git curl ca-certificates build-essential pkg-config \
+    git git-lfs curl ca-certificates build-essential pkg-config \
+    && git lfs install \
     && rm -rf /var/lib/apt/lists/*
+
 
 # Create non-root user for VS Code
 ARG USERNAME=vscode
