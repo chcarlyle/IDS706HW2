@@ -98,7 +98,7 @@ def default_model(sbd_df_polars, numeric_features, cate_features, target):
     print(f'Default Mean Squared Error: {mse}')
     return y,X_train,X_test,y_train,y_test,model
 
-y, X_train, X_test, y_train, y_test, model = default_model(sbd_df_polars)
+y, X_train, X_test, y_train, y_test, model = default_model(sbd_df_polars, ['BodyweightKg'], ['Sex', 'Equipment', 'AgeClass'], ['TotalKg'])
 
 n_estimators = [100, 200, 300]
 max_depth = [3, 5, 7]
@@ -130,7 +130,8 @@ def tune_hypers(X_train, X_test, y_train, y_test, model, n_estimators, max_depth
     joblib.dump(best_model, 'outputs/best_powerlifting_model.pkl')
     return y_pred_best
 
-y_pred_best = tune_hypers(X_train, X_test, y_train, y_test, model, n_estimators, max_depth, learning_rate, subsample, reg_alpha, reg_lambda)
+y_pred_best = tune_hypers(X_train, X_test, y_train, y_test, 
+                          model, n_estimators, max_depth, learning_rate, subsample, reg_alpha, reg_lambda)
 
 #Plot actual vs predicted
 plt.figure(figsize=(10,6))
