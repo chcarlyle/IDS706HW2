@@ -1,121 +1,71 @@
-# Powerlifting Data Analysis – Week 1 Project
+# Powerlifting Data Analysis
 
-![Test Status](https://github.com/chcarlyle/IDS706HW2/actions/workflows/python-tests.yml/badge.svg)
+![CI](https://github.com/chcarlyle/IDS706HW2/actions/workflows/python-tests.yml/badge.svg)
 
-## Overview
-This assignment explores the [OpenPowerlifting dataset](https://www.kaggle.com/datasets/open-powerlifting/powerlifting-database) as part of the two-week data analysis assignment. The goals for this first week are to:
-- Import and inspect the dataset.
-- Perform basic filtering and grouping.
-- Explore a machine learning algorithm including hyperparameters.
-- Create one visualization.
-- Document findings
+This repository contains a small end-to-end pipeline that loads the OpenPowerlifting dataset, prepares features, fits several regression models to predict a competitor's 3-lift total (`TotalKg`), and produces artifacts (trained pipeline pickles and actual-vs-predicted plots).
+
+Key points
+- Tests are written with `pytest` and live under `tests/`.
+- The main orchestration script is `powerlifting.py` which runs a roster of regressors, saves model artifacts into `outputs/`, and writes a `outputs/metrics.csv` summary.
+- CI is configured with GitHub Actions and runs `flake8` and `pytest`.
 
 ---
 
-## Automated Testing
+## Automated testing
 
-The repository includes a script, `test_powerlifting.py`, which provides automated unit tests for the core data analysis and machine learning workflow. This script uses Python's `unittest` framework and covers:
+The repository includes a `tests/` directory with pytest-based unit tests that cover:
 
-- **Basic Functionality:**
-  - Data loading with both Pandas and Polars
-  - Filtering for SBD events
-  - Running the machine learning pipeline (LightGBM regression) on a sample
+- Basic functionality: data loading, SBD filtering, model pipeline execution on a small sample.
+- Edge cases: missing columns, empty dataframes, and other consistency checks.
 
-- **Edge Cases:**
-  - Handling empty dataframes
-  - Missing required columns
-  - Features with all missing values
-  - No SBD events present
-  - Invalid values (e.g., negative weights)
-
-These tests help ensure the robustness of the analysis code, catching common data issues and verifying that the pipeline either handles or fails gracefully in problematic scenarios. To run the tests, execute:
+Run the tests with:
 
 ```bash
-python test_powerlifting.py
+pytest -q
 ```
 
-All tests should pass if the environment and data are set up correctly.
+All tests should pass in a correctly-configured Python environment.
 
 ## Dataset
-The dataset comes from **Kaggle**, where it was compiled from publicly available powerlifting competition results.
+The dataset originates from the OpenPowerlifting project (commonly distributed via Kaggle). The full CSV is large; a small sample `data/openpowerlifting_sample.csv` is provided for quick development and tests.
 
----
-
-## Large dataset (Git LFS) and local development
-
-The full `openpowerlifting.csv` is tracked with Git LFS in this repository. To work with the real dataset locally or in CI, follow these steps:
-
-- Install Git LFS and enable it for your machine:
+### Git LFS
+If you store the full CSV with Git LFS, install and pull LFS files locally:
 
 ```bash
 git lfs install
-```
-
-- If you clone the repo, fetch LFS files with:
-
-```bash
 git lfs pull
 ```
 
-- CI is configured to download LFS files automatically (the GitHub Actions checkout step uses `lfs: true`).
+Note: the GitHub Actions checkout step enables LFS if needed.
 
-- For quick local development and to avoid storing huge files in the repo, a small sample `openpowerlifting_sample.csv` is included. The test suite will automatically fall back to this sample if the real CSV is missing or only the LFS pointer is present.
+## What the scripts do
 
-You can also run the helper script to fetch LFS files if available on your machine:
+- `data_processing.py`: helpers to load CSV (pandas/polars fallback), filter for SBD, and prepare a modeling DataFrame.
+- `models.py`: `train_and_evaluate_model(...)` builds a preprocessing + estimator pipeline, fits it, evaluates MSE, and optionally saves an artifact (joblib .pkl) containing `model`, `mse`, `X_test`, `y_test`, `y_pred`.
+- `visualization.py`: `plot_actual_vs_predicted_from_pickle(...)` loads a saved artifact and writes a scatter plot of actual vs predicted values.
+- `powerlifting.py`: orchestrates running a roster of regressors, saving artifacts to `outputs/` and writing `outputs/metrics.csv`.
 
-```bash
-./scripts/fetch_lfs.sh
-```
+## Visualization and outputs
 
+Running `python powerlifting.py` will populate `outputs/` with artifacts and PNGs:
 
-## Steps Completed
-
-### 1. Importing the Dataset
-- Loaded the dataset with **Pandas** using `pd.read_csv()`.
-- Loaded the dataset with **Polars** using `pl.read_csv()`.  
-
-### 2. Inspecting the Data
-- Inspected with `.head()`, `.info()`, `.describe()`, `.shape` and checks for missing values.
-- Also inspected using the **Polars** equivalents
-
-### 3. Basic Filtering and Grouping
-- Filter down to only rows for SBD competitions so there are attempts for all lifts
-- Filter out people who failed to record a 3-lift total  
-- Computed summary statistics such as mean **TotalKg** grouped by sex and equipment type.
-
-### 4. Machine Learning Exploration
-- Defined features: `Sex`, `Equipment`, `BodyweightKg`, `AgeClass`.  
-- Target variable: `TotalKg`.
-- **Polars** and **Pandas** workflows are merged as the data all goes to **Pandas** for **Sklearn** compatibility. 
-- Preprocessing:
-  - One-hot encoded categorical variables.
-  - Imputed missing numeric values with the median.  
-- Model:
-  - Built a pipeline with **LightGBM Regressor** (`LGBMRegressor`).  
-  - Split data into train/test sets.  
-  - Performed **RandomizedSearchCV** for hyperparameter tuning.  
-- Evaluation:
-  - Reported best parameters.
-  - Evaluated performance with Mean Squared Error (MSE).
-
-### 5. Visualization
-- Created a scatter plot of **Actual vs Predicted TotalKg** with a reference diagonal.  
-- This highlights how closely the model’s predictions align with true outcomes.
- ![PredictedVsActualPlot](outputs/actual_vs_predicted_totalkg.png)
-
----
+- `outputs/<model_name>_artifact.pkl` — saved joblib artifact with pipeline + predictions
+- `outputs/<model_name>_actual_vs_predicted.png` — actual vs predicted plot
+- `outputs/metrics.csv` — summary of model MSEs
 
 ## Findings
-- The dataset is large, varied, and requires handling categorical and missing values.  
-- The model predicts `TotalKg` when accounting for `Sex`, `Equipment`, `BodyweightKg`, `AgeClass`.  
-- LightGBM provides a fast algorithm which is useful for training and exploring the numerical target
-- LightGBM regression provides a flexible baseline model, with hyperparameter tuning improving results.  
-- Visualization shows prediction accuracy is reasonable but with room for refinement.
+The current regressors examined show higher performance from LightGBM over the other candidates, Random Forest, Gradient Boosting, Ridge Regression, and Elastic-Net Regression. The models are evaluated using MSE, and the script is abstracted so other regressors can be tested, or other subsets of columns. LightBGM is also trained with tuned hyperparameters after it is chosen to achieve even lower MSE after selecting hyperparameters from Randomized Grid Search.
 
----
+## Assignment 5 Components
+Best predictive model:
+![lgb_best](outputs/lgb_random_search_actual_vs_predicted.png)
 
-## Assignment 5 Tasks
-Below are the screenshots displaying successful CI Workflows, the commit that applied refactoring using F2 to rename variables, and the commit that used extract method to abstract the default model training, allowing it to be done by just changing the variable list input.
-![CIWorkflows](outputs/Screenshot%202025-09-30%20110924.png)
-![F2Refactoring](outputs/Screenshot%202025-09-30%20110241.png)
-![ExtractMethodRefactoring](outputs/Screenshot%202025-09-30%20110353.png)
+Screenshots showing refactoring and successful CI runs
+![Refactoring F2](outputs/Screenshot%202025-09-30%20110241.png)
+![Refactoring Extract](outputs/Screenshot%202025-09-30%20110353.png)
+![CI Passing](outputs/Screenshot%202025-09-30%20110924.png)
+
+Flake8 and black were also implemented for the files.
+
+For improving the project, I spent time revising the current structure so the code is stored in separate files. This allows me to call the functions like training models and generating output graphs with different sets of variables, hyperparameters, and even regressors since scikit-learn models are built in similar ways. Rather than arbitrarily using LightGBM for the model, this repository explores other model options, particularly other regressors, in the main script `powerlifting.py` to determine which one achieves the lowest error for this particular data set.
