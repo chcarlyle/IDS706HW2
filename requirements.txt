@@ -7,3 +7,5 @@ matplotlib
 lightgbm
 pyarrow
 joblib
+black
+flake8
