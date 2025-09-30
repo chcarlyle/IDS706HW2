@@ -5,7 +5,7 @@
 all: test
 
 # Files to operate on by default (can be overridden with FILE=...)
-TARGETS := powerlifting.py test_powerlifting.py
+TARGETS := powerlifting.py data_processing.py models.py visualization.py tests/test_powerlifting.py tests/test_data_processing.py tests/test_models.py tests/test_visualization.py tests/conftest.py
 FILE ?= $(TARGETS)
 
 # Tools (can be overridden in environment)
@@ -17,7 +17,11 @@ FLAKE8_IGNORE ?= E501,W503,E231
 
 # Run all unit tests
 test:
-	python test_powerlifting.py
+	python tests/test_powerlifting.py
+	python tests/test_data_processing.py
+	python tests/test_models.py
+	python tests/test_visualization.py
+	python tests/conftest.py
 
 # Format Python files with black. Usage:
 #   make format          # formats default TARGETS
