@@ -123,19 +123,19 @@ def tune_hypers(X_train, X_test, y_train, y_test, model, n_estimators, max_depth
 
 #Evaluate the best model
     best_model = grid_search.best_estimator_
-    y_pred_best = best_model.predict(X_test)
-    mse_best = mean_squared_error(y_test, y_pred_best)
+    y_p = best_model.predict(X_test)
+    mse_best = mean_squared_error(y_test, y_p)
     print(f'Best Model Mean Squared Error: {mse_best}')
 #Save best model to outputs/
     joblib.dump(best_model, 'outputs/best_powerlifting_model.pkl')
-    return y_pred_best
+    return y_p
 
-y_pred_best = tune_hypers(X_train, X_test, y_train, y_test, 
+y_p = tune_hypers(X_train, X_test, y_train, y_test, 
                           model, n_estimators, max_depth, learning_rate, subsample, reg_alpha, reg_lambda)
 
 #Plot actual vs predicted
 plt.figure(figsize=(10,6))
-plt.scatter(y_test, y_pred_best, alpha=0.5)
+plt.scatter(y_test, y_p, alpha=0.5)
 plt.plot([y.min(), y.max()], [y.min(), y.max()], 'r--')
 plt.xlabel('Actual TotalKg')
 plt.ylabel('Predicted TotalKg')
