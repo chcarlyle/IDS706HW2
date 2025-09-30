@@ -101,7 +101,7 @@ You can also run the helper script to fetch LFS files if available on your machi
 ### 5. Visualization
 - Created a scatter plot of **Actual vs Predicted TotalKg** with a reference diagonal.  
 - This highlights how closely the model’s predictions align with true outcomes.
- ![PredictedVsActualPlot](PredVActual.png)
+ ![PredictedVsActualPlot](outputs/actual_vs_predicted_totalkg.png)
 
 ---
 
@@ -113,3 +113,9 @@ You can also run the helper script to fetch LFS files if available on your machi
 - Visualization shows prediction accuracy is reasonable but with room for refinement.
 
 ---
+
+## Assignment 5 Tasks
+Below are the screenshots displaying successful CI Workflows, the commit that applied refactoring using F2 to rename variables, and the commit that used extract method to abstract the default model training, allowing it to be done by just changing the variable list input.
+![CIWorkflows](outputs/Screenshot%202025-09-30%20110924.png)
+![F2Refactoring](outputs/Screenshot%202025-09-30%20110241.png)
+![ExtractMethodRefactoring](outputs/Screenshot%202025-09-30%20110353.png)

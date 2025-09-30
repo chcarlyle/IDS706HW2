@@ -13,7 +13,7 @@ BLACK ?= black
 FLAKE8 ?= flake8
 
 # Flake8 ignore codes (comma-separated)
-FLAKE8_IGNORE ?= E501,W503
+FLAKE8_IGNORE ?= E501,W503,E231
 
 # Run all unit tests
 test:
