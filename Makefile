@@ -17,11 +17,8 @@ FLAKE8_IGNORE ?= E501,W503,E231
 
 # Run all unit tests
 test:
-	python tests/test_powerlifting.py
-	python tests/test_data_processing.py
-	python tests/test_models.py
-	python tests/test_visualization.py
-	python tests/conftest.py
+	@# Run the test suite with pytest (keeps things simple for CI)
+	pytest -q
 
 # Format Python files with black. Usage:
 #   make format          # formats default TARGETS
